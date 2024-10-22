@@ -26,6 +26,10 @@ if (!class_exists('TlgContent')) {
             add_action('init', [$this, 'register_post_type']);
             add_action('admin_menu', [$this, 'add_menus']);
             add_action('admin_enqueue_scripts', [$this, 'load_admin_assets']);
+            add_action('wp_ajax_tlg_content_new_location_handler', [
+                $this,
+                'new_location_handler',
+            ]);
         }
 
         public function register_post_type()
@@ -91,12 +95,51 @@ if (!class_exists('TlgContent')) {
 
         public function new_location_page()
         {
-            ?>
+            $nonce = wp_create_nonce('tlg-content-new-location'); ?>
                 <div class="wrap">
                     <h2>TLG Content</h2>
                     <p>Initialise content for a new location</p>
+
+                    <form method="post" id="new-location">
+                        <label for="location">Location</label>
+                        <input type="text" name="location" required>
+                        <input type="hidden" name="nonce" value="<?php echo $nonce; ?>">
+
+                        <button type="submit">Create</button>
+                    </form>
+
+                    <div id="tlg-content-new-location-log">
+
+                    </div>
                 </div>
             <?php
+        }
+
+        public function new_location_handler()
+        {
+            if (
+                !isset($_POST['nonce']) ||
+                !wp_verify_nonce($_POST['nonce'], 'tlg-content-new-location')
+            ) {
+                error_log('Invalid nonce');
+                wp_send_json_error('Invalid nonce');
+            }
+
+            // Location.
+            $location = sanitize_text_field($_POST['location']);
+            $location_key = sanitize_title($location);
+
+            // If location is london then return error.
+            if (strtolower($location) === 'london') {
+                wp_send_json_error('London is not a valid location');
+            }
+
+            $array_result = [
+                'success' => true,
+            ];
+
+            // Make your array as json
+            wp_send_json($array_result);
         }
 
         public function load_admin_assets()
@@ -115,6 +158,9 @@ if (!class_exists('TlgContent')) {
                 1,
                 true
             );
+            wp_localize_script('tlg-content', 'tlg_content_ajax', [
+                'ajax_url' => admin_url('admin-ajax.php'),
+            ]);
         }
     }
 
