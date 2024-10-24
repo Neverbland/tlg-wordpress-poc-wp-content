@@ -24,12 +24,61 @@ if (!class_exists('TlgContent')) {
         public function initialize()
         {
             add_action('init', [$this, 'register_post_type']);
+            add_action('init', [$this, 'register_taxonomy']);
             add_action('admin_menu', [$this, 'add_menus']);
             add_action('admin_enqueue_scripts', [$this, 'load_admin_assets']);
             add_action('wp_ajax_tlg_content_new_location_handler', [
                 $this,
                 'new_location_handler',
             ]);
+            add_action(
+                'save_post_landing_page',
+                [$this, 'save_handler'],
+                10,
+                2
+            );
+        }
+
+        public function save_handler($post_id, $post)
+        {
+            $permalink = $post->post_name;
+
+            // Fetch the first saved location taxonomy linked to this post.
+            $terms = get_the_terms($post_id, 'location');
+            $location = $terms && !is_wp_error($terms) ? $terms[0] : null;
+
+            if ($location) {
+                $term_slug = $location->slug;
+            } else {
+                $term_slug = 'unassigned';
+            }
+
+            $parts = explode('__', $permalink);
+            $post_slug = end($parts);
+
+            $combined = $term_slug . '__' . $post_slug;
+
+            // unhook this function to prevent infinite looping
+            remove_action(
+                'save_post_landing_page',
+                [$this, 'save_handler'],
+                10,
+                2
+            );
+
+            // update the post slug
+            wp_update_post([
+                'ID' => $post_id,
+                'post_name' => $combined,
+            ]);
+
+            // re-hook this function
+            add_action(
+                'save_post_landing_page',
+                [$this, 'save_handler'],
+                10,
+                2
+            );
         }
 
         public function register_post_type()
@@ -60,6 +109,34 @@ if (!class_exists('TlgContent')) {
             ];
 
             register_post_type('landing_page', $args);
+        }
+
+        public function register_taxonomy()
+        {
+            $args = [
+                'labels' => [
+                    'name' => __('Locations'),
+                    'singular_name' => __('Location'),
+                ],
+                'show_in_rest' => true,
+                'show_admin_column' => true,
+                'hierarchical' => false,
+                'rewrite' => ['slug' => 'locations'],
+                'public' => true,
+                'show_ui' => true,
+                'show_in_menu' => true,
+                'show_in_nav_menus' => true,
+                'show_tagcloud' => true,
+                'show_in_quick_edit' => true,
+                'show_admin_column' => true,
+                'show_in_graphql' => true,
+                'graphql_single_name' => 'location',
+                'graphql_plural_name' => 'locations',
+                'publicly_queryable' => true,
+                'capability' => 'manage_options',
+            ];
+
+            register_taxonomy('location', ['landing_page', 'post'], $args);
         }
 
         public function add_menus()
@@ -129,10 +206,12 @@ if (!class_exists('TlgContent')) {
             $location = sanitize_text_field($_POST['location']);
             $location_key = sanitize_title($location);
 
-            // If location is london then return error.
-            if (strtolower($location) === 'london') {
-                wp_send_json_error('London is not a valid location');
-            }
+            // // If location is london then return error.
+            // if (strtolower($location) === 'london') {
+            //     wp_send_json_error('London is not a valid location');
+            // }
+
+            // Here we want to duplicate the content from the template location.
 
             $array_result = [
                 'success' => true,
@@ -162,6 +241,37 @@ if (!class_exists('TlgContent')) {
                 'ajax_url' => admin_url('admin-ajax.php'),
             ]);
         }
+    }
+
+    function custom_job_post_type_link($post_id, $post)
+    {
+        $permalink = $post->post_name;
+        $companyname = $post->_company_name;
+
+        if (strpos($permalink, sanitize_title($companyname))) {
+            // <-- Here
+            return;
+        }
+
+        // unhook this function to prevent infinite looping
+        remove_action(
+            'save_post_job_listing',
+            'custom_job_post_type_link',
+            10,
+            2
+        );
+
+        // add the id to the slug
+        $permalink .= '-' . sanitize_title($companyname); // <-- And here
+
+        // update the post slug
+        wp_update_post([
+            'ID' => $post_id,
+            'post_name' => $permalink,
+        ]);
+
+        // re-hook this function
+        add_action('save_post_job_listing', 'custom_job_post_type_link', 10, 2);
     }
 
     function tlgContent()
