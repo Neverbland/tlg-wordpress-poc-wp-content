@@ -31,12 +31,12 @@ if (!class_exists('TlgContent')) {
                 $this,
                 'new_location_handler',
             ]);
-            add_action(
-                'save_post_landing_page',
-                [$this, 'save_handler'],
-                10,
-                2
-            );
+            // add_action(
+            //     'save_post_landing_page',
+            //     [$this, 'save_handler'],
+            //     10,
+            //     2
+            // );
         }
 
         public function save_handler($post_id, $post)
@@ -243,36 +243,36 @@ if (!class_exists('TlgContent')) {
         }
     }
 
-    function custom_job_post_type_link($post_id, $post)
-    {
-        $permalink = $post->post_name;
-        $companyname = $post->_company_name;
+    // function custom_job_post_type_link($post_id, $post)
+    // {
+    //     $permalink = $post->post_name;
+    //     $companyname = $post->_company_name;
 
-        if (strpos($permalink, sanitize_title($companyname))) {
-            // <-- Here
-            return;
-        }
+    //     if (strpos($permalink, sanitize_title($companyname))) {
+    //         // <-- Here
+    //         return;
+    //     }
 
-        // unhook this function to prevent infinite looping
-        remove_action(
-            'save_post_job_listing',
-            'custom_job_post_type_link',
-            10,
-            2
-        );
+    //     // unhook this function to prevent infinite looping
+    //     remove_action(
+    //         'save_post_job_listing',
+    //         'custom_job_post_type_link',
+    //         10,
+    //         2
+    //     );
 
-        // add the id to the slug
-        $permalink .= '-' . sanitize_title($companyname); // <-- And here
+    //     // add the id to the slug
+    //     $permalink .= '-' . sanitize_title($companyname); // <-- And here
 
-        // update the post slug
-        wp_update_post([
-            'ID' => $post_id,
-            'post_name' => $permalink,
-        ]);
+    //     // update the post slug
+    //     wp_update_post([
+    //         'ID' => $post_id,
+    //         'post_name' => $permalink,
+    //     ]);
 
-        // re-hook this function
-        add_action('save_post_job_listing', 'custom_job_post_type_link', 10, 2);
-    }
+    //     // re-hook this function
+    //     add_action('save_post_job_listing', 'custom_job_post_type_link', 10, 2);
+    // }
 
     function tlgContent()
     {
@@ -289,3 +289,218 @@ if (!class_exists('TlgContent')) {
     // Instantiate.
     tlgContent();
 } // class_exists check
+
+add_action('acf/include_fields', function () {
+    if (!function_exists('acf_add_local_field_group')) {
+        return;
+    }
+    /**
+     * @disregard P1009 Undefined type
+     */
+    acf_add_local_field_group([
+        'key' => 'group_67068953b2313',
+        'title' => 'Landing page',
+        'fields' => [
+            [
+                'key' => 'field_6707c979e1240',
+                'label' => 'Page builder',
+                'name' => 'page_builder',
+                'aria-label' => '',
+                'type' => 'flexible_content',
+                'instructions' => '',
+                'required' => 0,
+                'conditional_logic' => 0,
+                'wrapper' => [
+                    'width' => '',
+                    'class' => '',
+                    'id' => '',
+                ],
+                'layouts' => [
+                    'layout_6707c97ef3222' => [
+                        'key' => 'layout_6707c97ef3222',
+                        'name' => 'text',
+                        'label' => 'Text',
+                        'display' => 'block',
+                        'sub_fields' => [
+                            [
+                                'key' => 'field_6707d0f9e1241',
+                                'label' => 'Text',
+                                'name' => 'text',
+                                'aria-label' => '',
+                                'type' => 'wysiwyg',
+                                'instructions' => '',
+                                'required' => 0,
+                                'conditional_logic' => 0,
+                                'wrapper' => [
+                                    'width' => '',
+                                    'class' => '',
+                                    'id' => '',
+                                ],
+                                'default_value' => '',
+                                'allow_in_bindings' => 0,
+                                'tabs' => 'all',
+                                'toolbar' => 'full',
+                                'media_upload' => 1,
+                                'delay' => 0,
+                                'show_in_graphql' => 1,
+                                'graphql_description' => '',
+                                'graphql_field_name' => 'text',
+                                'graphql_non_null' => 0,
+                            ],
+                        ],
+                        'min' => '',
+                        'max' => '',
+                    ],
+                    'layout_6707d12fe1243' => [
+                        'key' => 'layout_6707d12fe1243',
+                        'name' => 'hero',
+                        'label' => 'Hero',
+                        'display' => 'block',
+                        'sub_fields' => [
+                            [
+                                'key' => 'field_6707d15ce1245',
+                                'label' => 'Title',
+                                'name' => 'title',
+                                'aria-label' => '',
+                                'type' => 'text',
+                                'instructions' => '',
+                                'required' => 0,
+                                'conditional_logic' => 0,
+                                'wrapper' => [
+                                    'width' => '',
+                                    'class' => '',
+                                    'id' => '',
+                                ],
+                                'default_value' => '',
+                                'maxlength' => '',
+                                'allow_in_bindings' => 0,
+                                'placeholder' => '',
+                                'prepend' => '',
+                                'append' => '',
+                                'show_in_graphql' => 1,
+                                'graphql_description' => '',
+                                'graphql_field_name' => 'title',
+                                'graphql_non_null' => 0,
+                            ],
+                            [
+                                'key' => 'field_6707d165e1246',
+                                'label' => 'Image',
+                                'name' => 'image',
+                                'aria-label' => '',
+                                'type' => 'image',
+                                'instructions' => '',
+                                'required' => 0,
+                                'conditional_logic' => 0,
+                                'wrapper' => [
+                                    'width' => '',
+                                    'class' => '',
+                                    'id' => '',
+                                ],
+                                'return_format' => 'array',
+                                'library' => 'all',
+                                'min_width' => '',
+                                'min_height' => '',
+                                'min_size' => '',
+                                'max_width' => '',
+                                'max_height' => '',
+                                'max_size' => '',
+                                'mime_types' => '',
+                                'allow_in_bindings' => 0,
+                                'preview_size' => 'medium',
+                                'show_in_graphql' => 1,
+                                'graphql_description' => '',
+                                'graphql_field_name' => 'image',
+                            ],
+                        ],
+                        'min' => '',
+                        'max' => '',
+                    ],
+                    'layout_6707d392da3a4' => [
+                        'key' => 'layout_6707d392da3a4',
+                        'name' => 'related_landing_pages',
+                        'label' => 'Related landing pages',
+                        'display' => 'block',
+                        'sub_fields' => [
+                            [
+                                'key' => 'field_6707d3a0da3a6',
+                                'label' => 'Related landing pages',
+                                'name' => 'related_landing_pages',
+                                'aria-label' => '',
+                                'type' => 'relationship',
+                                'instructions' => '',
+                                'required' => 0,
+                                'conditional_logic' => 0,
+                                'wrapper' => [
+                                    'width' => '',
+                                    'class' => '',
+                                    'id' => '',
+                                ],
+                                'post_type' => [
+                                    0 => 'landing_page',
+                                ],
+                                'post_status' => '',
+                                'taxonomy' => '',
+                                'filters' => [
+                                    0 => 'search',
+                                    1 => 'post_type',
+                                    2 => 'taxonomy',
+                                ],
+                                'return_format' => 'object',
+                                'min' => '',
+                                'max' => '',
+                                'allow_in_bindings' => 0,
+                                'elements' => '',
+                                'bidirectional' => 0,
+                                'show_in_graphql' => 1,
+                                'graphql_description' => '',
+                                'graphql_field_name' => 'relatedLandingPages',
+                                'graphql_connection_type' => 'one_to_many',
+                                'bidirectional_target' => [],
+                            ],
+                        ],
+                        'min' => '0',
+                        'max' => '3',
+                    ],
+                ],
+                'min' => '',
+                'max' => '',
+                'button_label' => 'Add Row',
+                'show_in_graphql' => 1,
+                'graphql_description' => '',
+                'graphql_field_name' => '',
+                'graphql_non_null' => 0,
+            ],
+        ],
+        'location' => [
+            [
+                [
+                    'param' => 'post_type',
+                    'operator' => '==',
+                    'value' => 'landing_page',
+                ],
+            ],
+        ],
+        'menu_order' => 0,
+        'position' => 'normal',
+        'style' => 'default',
+        'label_placement' => 'top',
+        'instruction_placement' => 'label',
+        'hide_on_screen' => '',
+        'active' => true,
+        'description' => '',
+        'show_in_rest' => 1,
+        'show_in_graphql' => 1,
+        'graphql_field_name' => 'landingPage',
+        'map_graphql_types_from_location_rules' => 0,
+        'graphql_types' => '',
+    ]);
+});
+
+// https://wpml.org/forums/topic/unable-to-query-a-post-by-a-slug-with-graphql/
+add_filter('request', function ($vars) {
+    if (isset($vars['graphql']) && !empty($vars['name'])) {
+        $vars['suppress_filters'] = true;
+    }
+
+    return $vars;
+});

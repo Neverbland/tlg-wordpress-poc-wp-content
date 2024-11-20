@@ -24,6 +24,9 @@
 
 # DO NOT ignore these plugins...
 !/plugins/tlg-content
+!/plugins/tlg-core
+!/plugins/tlg-franchise
+!/plugins/tlg-global
 
 #---------------------------
 # WP MU plugins: often
@@ -109,3 +112,5 @@ autoupdater_maintenance_mode_enabled.tmp
 # Other
 #---------------------------
 .gitattributes
+
+languages/**
