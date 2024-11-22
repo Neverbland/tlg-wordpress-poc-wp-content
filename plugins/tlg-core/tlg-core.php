@@ -5,7 +5,7 @@
  * @wordpress-plugin
  * Plugin Name: TLG Core
  * Description: Custom content configuration for The Little Gym
- * Requires Plugins: wpml-graphql, sitepress-multilingual-cms, advanced-custom-fields-pro, wp-graphql, wpgraphql-acf, wpml-media-translation
+ * Requires Plugins: wpml-graphql, sitepress-multilingual-cms, advanced-custom-fields-pro, wp-graphql, wpgraphql-acf, wpml-media-translation, revisionary-pro, presspermit-pro
  */
 
 if (!defined('ABSPATH')) {
